@@ -1,0 +1,5 @@
+{
+  "name": "Orienteer Pro",
+  "description": "Aplicación de carreras de orientación con cronometraje, mapas interactivos y reportes PDF para estudiantes.",
+  "requestFramePermissions": []
+}
