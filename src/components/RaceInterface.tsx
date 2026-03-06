@@ -94,7 +94,10 @@ export default function RaceInterface({ courseName, controls, onFinish }: Props)
   const mapUrl = COURSES.find(c => c.name === courseName)?.mapUrl || `https://picsum.photos/seed/orientation-map-${courseName}/1200/1600`;
 
   return (
-    <div className={`flex flex-col ${isFullscreen ? 'fixed inset-0 z-50 bg-slate-900' : 'h-[calc(100vh-2rem)] max-h-[900px]'}`}>
+    <div className={cn(
+      "flex flex-col",
+      isFullscreen ? "fixed inset-0 z-50 bg-slate-900" : "w-full max-w-2xl mx-auto"
+    )}>
       {/* Header with Stats */}
       {!isFullscreen && (
         <div className="bg-white p-4 rounded-t-2xl border-b border-slate-100 flex items-center justify-between shadow-sm">
@@ -126,14 +129,20 @@ export default function RaceInterface({ courseName, controls, onFinish }: Props)
       )}
 
       {/* Map Area */}
-      <div className={`flex-1 bg-slate-900 relative overflow-hidden ${isFullscreen ? '' : 'rounded-none sm:rounded-none'}`}>
+      <div className={cn(
+        "relative overflow-hidden bg-white",
+        isFullscreen ? "flex-1 bg-slate-900" : "w-full border-y border-slate-100"
+      )}>
         <QuickPinchZoom onUpdate={onUpdate} wheelScaleFactor={0.1}>
-          <div className="w-full h-full flex items-center justify-center">
+          <div className={cn(
+            "w-full flex items-center justify-center",
+            isFullscreen ? "h-full" : "min-h-[200px]"
+          )}>
             <img
               ref={imgRef}
               src={mapUrl}
               alt="Mapa de Orientación"
-              className="max-w-none w-full h-auto"
+              className="w-full h-auto max-w-none"
               referrerPolicy="no-referrer"
             />
           </div>
