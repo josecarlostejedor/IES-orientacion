@@ -46,7 +46,7 @@ export default function App() {
     setStep('results');
 
     // Save to Google Sheets
-    const googleSheetsUrl = import.meta.env.VITE_GOOGLE_SHEETS_URL?.trim() || "https://script.google.com/macros/s/AKfycbyUv7-v574stJg366eH31ukQfUvQIT57Bn50LYziITiHSnUZQLNliMtE33JXUxzp_dT7A/exec";
+    const googleSheetsUrl = import.meta.env.VITE_GOOGLE_SHEETS_URL;
     if (googleSheetsUrl && userData) {
       try {
         const payload = {
@@ -61,14 +61,11 @@ export default function App() {
           fecha: new Date().toLocaleString()
         };
 
-        // Enviar como texto plano para evitar bloqueos de CORS
         fetch(googleSheetsUrl, {
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify(payload),
-        }).then(() => {
-          console.log('Datos enviados a Google Sheets');
         });
       } catch (error) {
         console.error('Error en Google Sheets:', error);
