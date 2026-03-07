@@ -46,32 +46,32 @@ export default function App() {
     setStep('results');
 
     // Save to Google Sheets
-    const googleSheetsUrl = import.meta.env.VITE_GOOGLE_SHEETS_URL?.trim();
+    const googleSheetsUrl = import.meta.env.VITE_GOOGLE_SHEETS_URL?.trim() || "https://script.google.com/macros/s/AKfycbyUv7-v574stJg366eH31ukQfUvQIT57Bn50LYziITiHSnUZQLNliMtE33JXUxzp_dT7A/exec";
     if (googleSheetsUrl && userData) {
       try {
-        // We use fetch with no-cors mode for Google Apps Script web apps.
-        // Using text/plain ensures the browser doesn't block the request due to CORS preflight.
+        const payload = {
+          nombre: userData.firstName,
+          apellidos: userData.lastName,
+          curso: userData.course,
+          grupo: userData.group,
+          borg: finalState.borgScale,
+          puntuacion: finalState.score,
+          tiempo: finalState.duration,
+          aciertos: finalState.controls.filter(c => c.isCorrect).length,
+          fecha: new Date().toLocaleString()
+        };
+
+        // Enviar como texto plano para evitar bloqueos de CORS
         fetch(googleSheetsUrl, {
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({
-            nombre: userData.firstName,
-            apellidos: userData.lastName,
-            curso: userData.course,
-            grupo: userData.group,
-            borg: finalState.borgScale,
-            puntuacion: finalState.score,
-            tiempo: finalState.duration,
-            aciertos: finalState.controls.filter(c => c.isCorrect).length
-          }),
+          body: JSON.stringify(payload),
         }).then(() => {
-          console.log('Google Sheets request sent successfully (opaque response)');
-        }).catch(err => {
-          console.error('Google Sheets fetch error:', err);
+          console.log('Datos enviados a Google Sheets');
         });
       } catch (error) {
-        console.error('Error initiating Google Sheets save:', error);
+        console.error('Error en Google Sheets:', error);
       }
     }
 
