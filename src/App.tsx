@@ -46,14 +46,15 @@ export default function App() {
     setStep('results');
 
     // Save to Google Sheets
-    const googleSheetsUrl = import.meta.env.VITE_GOOGLE_SHEETS_URL;
+    const googleSheetsUrl = import.meta.env.VITE_GOOGLE_SHEETS_URL?.trim();
     if (googleSheetsUrl && userData) {
       try {
-        // We use fetch with no-cors mode for Google Apps Script web apps
+        // We use fetch with no-cors mode for Google Apps Script web apps.
+        // Using text/plain ensures the browser doesn't block the request due to CORS preflight.
         fetch(googleSheetsUrl, {
           method: 'POST',
           mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify({
             nombre: userData.firstName,
             apellidos: userData.lastName,
@@ -64,17 +65,21 @@ export default function App() {
             tiempo: finalState.duration,
             aciertos: finalState.controls.filter(c => c.isCorrect).length
           }),
-        }).catch(err => console.error('Google Sheets silent error:', err));
+        }).then(() => {
+          console.log('Google Sheets request sent successfully (opaque response)');
+        }).catch(err => {
+          console.error('Google Sheets fetch error:', err);
+        });
       } catch (error) {
         console.error('Error initiating Google Sheets save:', error);
       }
     }
 
-    // Save to local database (existing logic)
+    // Save to local database
     if (userData && selectedCourseId) {
       const course = COURSES.find(c => c.id === selectedCourseId);
       try {
-        await fetch('/api/results', {
+        const response = await fetch('/api/results', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -89,8 +94,13 @@ export default function App() {
             score: finalState.score,
           }),
         });
+        if (response.ok) {
+          console.log('Local database results saved successfully');
+        } else {
+          console.error('Local database save failed:', await response.text());
+        }
       } catch (error) {
-        console.error('Error saving results:', error);
+        console.error('Error saving to local database:', error);
       }
     }
   };
