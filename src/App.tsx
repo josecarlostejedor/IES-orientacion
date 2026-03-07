@@ -46,8 +46,8 @@ export default function App() {
     setStep('results');
 
     // Save to Google Sheets
-    const googleSheetsUrl = import.meta.env.VITE_GOOGLE_SHEETS_URL;
-    if (googleSheetsUrl && userData) {
+    const googleSheetsUrl = import.meta.env.VITE_GOOGLE_SHEETS_URL || 'https://script.google.com/macros/s/AKfycbyUv7-v574stJg366eH31ukQfUvQIT57Bn50LYziITiHSnUZQLNliMtE33JXUxzp_dT7A/exec';
+    if (userData) {
       try {
         const payload = {
           nombre: userData.firstName,
