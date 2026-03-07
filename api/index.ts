@@ -1,10 +1,23 @@
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
-import Database from "better-sqlite3";
 
-const dbPath = process.env.VERCEL ? "/tmp/orientation.db" : "orientation.db";
-const db = new Database(dbPath);
+let db: any;
+try {
+  const Database = (await import("better-sqlite3")).default;
+  const dbPath = process.env.VERCEL ? "/tmp/orientation.db" : "orientation.db";
+  db = new Database(dbPath);
+} catch (e) {
+  console.error("Database not available:", e);
+  // Mock db for environments where better-sqlite3 fails to load
+  db = {
+    exec: () => {},
+    prepare: () => ({
+      run: () => ({ lastInsertRowid: 0 }),
+      all: () => []
+    })
+  };
+}
 
 // Initialize database
 db.exec(`
