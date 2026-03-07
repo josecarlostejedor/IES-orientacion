@@ -45,7 +45,32 @@ export default function App() {
     setRaceState(finalState);
     setStep('results');
 
-    // Save to database
+    // Save to Google Sheets
+    const googleSheetsUrl = import.meta.env.VITE_GOOGLE_SHEETS_URL;
+    if (googleSheetsUrl && userData) {
+      try {
+        // We use fetch with no-cors mode for Google Apps Script web apps
+        fetch(googleSheetsUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            nombre: userData.firstName,
+            apellidos: userData.lastName,
+            curso: userData.course,
+            grupo: userData.group,
+            borg: finalState.borgScale,
+            puntuacion: finalState.score,
+            tiempo: finalState.duration,
+            aciertos: finalState.controls.filter(c => c.isCorrect).length
+          }),
+        }).catch(err => console.error('Google Sheets silent error:', err));
+      } catch (error) {
+        console.error('Error initiating Google Sheets save:', error);
+      }
+    }
+
+    // Save to local database (existing logic)
     if (userData && selectedCourseId) {
       const course = COURSES.find(c => c.id === selectedCourseId);
       try {
