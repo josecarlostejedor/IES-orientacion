@@ -10,13 +10,41 @@ const PORT = 3000;
 app.use(express.json());
 
 // API routes
-app.post("/api/results", (req, res) => {
+app.post("/api/results", async (req, res) => {
   const result = {
     ...req.body,
     id: Date.now(),
     createdAt: new Date().toISOString()
   };
   resultsStore.push(result);
+
+  // Also send to Google Sheets from the server (more reliable)
+  const googleSheetsUrl = process.env.GOOGLE_SHEETS_URL || 'https://script.google.com/macros/s/AKfycbyUv7-v574stJg366eH31ukQfUvQIT57Bn50LYziITiHSnUZQLNliMtE33JXUxzp_dT7A/exec';
+  
+  try {
+    const payload = {
+      nombre: req.body.firstName,
+      apellidos: req.body.lastName,
+      curso: req.body.course,
+      grupo: req.body.group_num || req.body.group,
+      borg: req.body.borgScale,
+      puntuacion: req.body.score,
+      tiempo: req.body.duration,
+      aciertos: req.body.controls ? req.body.controls.filter((c: any) => c.isCorrect).length : 0,
+      fecha: new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" })
+    };
+
+    // Server-side fetch doesn't need no-cors and is much more stable
+    await fetch(googleSheetsUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload),
+    });
+    console.log('Data sent to Google Sheets successfully from server');
+  } catch (error) {
+    console.error('Error sending to Google Sheets from server:', error);
+  }
+
   res.json({ success: true, id: result.id });
 });
 
