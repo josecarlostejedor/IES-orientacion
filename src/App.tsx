@@ -45,34 +45,7 @@ export default function App() {
     setRaceState(finalState);
     setStep('results');
 
-    // Save to Google Sheets
-    const googleSheetsUrl = import.meta.env.VITE_GOOGLE_SHEETS_URL || 'https://script.google.com/macros/s/AKfycbyUv7-v574stJg366eH31ukQfUvQIT57Bn50LYziITiHSnUZQLNliMtE33JXUxzp_dT7A/exec';
-    if (userData) {
-      try {
-        const payload = {
-          nombre: userData.firstName,
-          apellidos: userData.lastName,
-          curso: userData.course,
-          grupo: userData.group,
-          borg: finalState.borgScale,
-          puntuacion: finalState.score,
-          tiempo: finalState.duration,
-          aciertos: finalState.controls.filter(c => c.isCorrect).length,
-          fecha: new Date().toLocaleString()
-        };
-
-        fetch(googleSheetsUrl, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify(payload),
-        });
-      } catch (error) {
-        console.error('Error en Google Sheets:', error);
-      }
-    }
-
-    // Save to local database
+    // Save to local database (which now also sends to Google Sheets)
     if (userData && selectedCourseId) {
       const course = COURSES.find(c => c.id === selectedCourseId);
       try {
@@ -92,12 +65,12 @@ export default function App() {
           }),
         });
         if (response.ok) {
-          console.log('Local database results saved successfully');
+          console.log('Results saved successfully (local + Google Sheets)');
         } else {
-          console.error('Local database save failed:', await response.text());
+          console.error('Save failed:', await response.text());
         }
       } catch (error) {
-        console.error('Error saving to local database:', error);
+        console.error('Error saving results:', error);
       }
     }
   };
