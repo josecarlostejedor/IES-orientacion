@@ -24,6 +24,7 @@ app.post("/api/results", async (req, res) => {
   try {
     // Prepare a super-robust payload
     const payload = {
+      // Original fields
       nombre: req.body.firstName || req.body.nombre || "",
       apellidos: req.body.lastName || req.body.apellidos || "",
       curso: req.body.course || req.body.curso || "",
@@ -33,7 +34,19 @@ app.post("/api/results", async (req, res) => {
       tiempo: req.body.duration || req.body.tiempo || "",
       fecha: new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" }),
       borg: req.body.borgScale || req.body.borg || 0,
-      aciertos: req.body.controls ? req.body.controls.filter((c: any) => c.isCorrect).length : 0
+      aciertos: req.body.controls ? req.body.controls.filter((c: any) => c.isCorrect).length : 0,
+      
+      // Compatibility fields for the user's reference script
+      firstName: req.body.firstName || "",
+      lastName: req.body.lastName || "",
+      course: req.body.course || "",
+      groupName: req.body.group_num || req.body.group || "",
+      age: req.body.age || "",
+      routeName: req.body.selectedRoute || req.body.recorrido || "No especificado",
+      score: req.body.score || 0,
+      totalTime: req.body.duration || "",
+      borgScale: req.body.borgScale || 0,
+      correctCount: req.body.controls ? req.body.controls.filter((c: any) => c.isCorrect).length : 0
     };
 
     console.log('--- GOOGLE SHEETS SYNC START ---');
