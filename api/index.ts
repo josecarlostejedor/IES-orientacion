@@ -23,22 +23,22 @@ app.post("/api/results", async (req, res) => {
   
   try {
     const payload = {
-      nombre: req.body.firstName,
-      apellidos: req.body.lastName,
-      curso: req.body.course,
-      grupo: req.body.group_num || req.body.group,
-      borg: req.body.borgScale,
-      recorrido: req.body.selectedRoute,
-      puntuacion: req.body.score,
-      tiempo: req.body.duration,
-      aciertos: req.body.controls ? req.body.controls.filter((c: any) => c.isCorrect).length : 0,
-      fecha: new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" })
+      nombre: req.body.firstName || "",
+      apellidos: req.body.lastName || "",
+      curso: req.body.course || "",
+      grupo: req.body.group_num || req.body.group || "",
+      recorrido: req.body.selectedRoute || "",
+      puntuacion: req.body.score || 0,
+      tiempo: req.body.duration || "",
+      fecha: new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" }),
+      borg: req.body.borgScale || 0,
+      aciertos: req.body.controls ? req.body.controls.filter((c: any) => c.isCorrect).length : 0
     };
 
-    // Server-side fetch doesn't need no-cors and is much more stable
+    // Server-side fetch with application/json
     await fetch(googleSheetsUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
     console.log('Data sent to Google Sheets successfully from server');
