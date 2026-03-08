@@ -28,6 +28,7 @@ app.post("/api/results", async (req, res) => {
       curso: req.body.course,
       grupo: req.body.group_num || req.body.group,
       borg: req.body.borgScale,
+      recorrido: req.body.selectedRoute,
       puntuacion: req.body.score,
       tiempo: req.body.duration,
       aciertos: req.body.controls ? req.body.controls.filter((c: any) => c.isCorrect).length : 0,
